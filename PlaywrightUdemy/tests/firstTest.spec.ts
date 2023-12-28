@@ -51,3 +51,17 @@ test.skip('User facing locators', async ({page}) => {
 
     //await page.getByTestId().click()
 })
+
+test('Locating child elements', async ({page}) => {
+    
+    //can place all locators in one line(similar to xpaths)
+    await page.locator('nb-card nb-radio :text-is("Option 1")').click()
+
+    //or you can chain locators
+    await page.locator('nb-card').locator('nb-radio').locator(':text-is("Option 2")').click()
+    await page.locator('nb-card').getByRole('button', {name: 'Sign in'}).first().click()
+
+    //find the index of the element from the specified locator(not recommended)
+    await page.locator('nb-card').nth(3).getByRole('button').click()
+
+})
