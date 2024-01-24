@@ -55,3 +55,29 @@ test.describe('Form Layouts Page', () => {
 
 })
 
+test('checkboxes', async ({page}) => {
+    await page.getByText('Modal & Overlays').click()
+    await page.getByText('Toastr').click()
+
+    //uncheck checkbox
+    await page.getByRole('checkbox', {name: 'Hide on Click'}).uncheck({force: true})
+
+    //check checkbox
+    await page.getByRole('checkbox', {name: 'Prevent arising of duplicate toast'}).check({force: true})
+
+    //check all checkboxes
+    const allCheckboxes = page.getByRole('checkbox')
+
+    //loop through all checkboxes and check them
+    for (let checkbox of await allCheckboxes.all()) {
+        await checkbox.check({force: true})
+        expect(await checkbox.isChecked()).toBeTruthy()
+    }
+
+    //loop through all checkboxes and uncheck them
+    for (let checkbox of await allCheckboxes.all()) {
+        await checkbox.uncheck({force: true})
+        expect(await checkbox.isChecked()).toBeFalsy()
+    }
+
+})
