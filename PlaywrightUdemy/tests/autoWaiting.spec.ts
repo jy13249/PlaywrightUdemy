@@ -33,3 +33,10 @@ test('alternative waits', async ({page}) => {
     const text = await successButton.allTextContents()
     expect(text).toContain('Data loaded with AJAX get request.')
 })
+
+test('timeouts', async ({page}) => {
+    test.setTimeout(10000)
+    
+    const successButton = page.locator('.bg-success')
+    await successButton.click({timeout: 16000})
+})
