@@ -139,4 +139,61 @@ test("dialog boxes", async({page}) => {
     await expect(page.locator('table tr').first()).not.toHaveText('mdo@gmail.com')
 })
 
+test("web tables", async({page}) => {
+    await page.getByText('Tables & Data').click()
+    await page.getByText('Smart Table').click()
+
+    //get the row by any text in the row
+    const targetRow = page.getByRole('row', {name: "twitter@outlook.com"})
+    await targetRow.locator(".nb-edit").click()
+    await page.locator("input-editor").getByPlaceholder("Age").clear()
+    await page.locator("input-editor").getByPlaceholder("Age").fill("35")
+    await page.locator(".nb-checkmark").click()
+
+    //get the row based on the value in the specific column
+    await page.locator(".ng2-smart-pagination-nav").getByText("2").click()
+    //grabs 2 rows, grabs the 2nd column values for each rows, and only grabs the column with the text 11
+    const targetRowById = page.getByRole("row", {name: "11"}).filter({has: page.locator("td").nth(1).getByText("11")})
+    await targetRowById.locator(".nb-edit").click()
+    await page.locator("input-editor").getByPlaceholder("E-mail").clear()
+    await page.locator("input-editor").getByPlaceholder("E-mail").fill("test@test.com")
+    await page.locator(".nb-checkmark").click()
+    await expect(targetRowById.locator("td").nth(5)).toHaveText("test@test.com")
+
+    //test the filter of the table
+    const ages = ["20", "30", "40", "200"]
+
+    //first loop to loop through all ages
+    for(let age of ages)
+    {
+        //clear the age filter and input age
+        await page.locator("input-filter").getByPlaceholder("Age").clear()
+        await page.locator("input-filter").getByPlaceholder("Age").fill(age)
+
+        if(age != "200")
+        {
+            //dynamic wait to wait for first row to contain age
+            await page.locator("tbody tr").nth(0).getByText(age).waitFor()
+            const ageRows = page.locator("tbody tr")
+
+            //second loop to get text for all rows and assert age in rows is age in filter
+            for(let row of await ageRows.all())
+            {
+                const cellValue = await row.locator("td").last().textContent()
+                expect(cellValue).toEqual(age)
+            }
+        }
+
+        //used for ages that don't return any rows of data
+        else{
+            await page.locator("tbody td").getByText("No data found").waitFor()
+            expect(await page.locator("tbody td").allInnerTexts()).toContain("No data found")
+        }
+        //get all rows after filter is applied
+        
+    }
+
+
+})
+
 
