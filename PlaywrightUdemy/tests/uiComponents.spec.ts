@@ -225,5 +225,37 @@ test("datepickers", async({page}) => {
     await expect(datepickerForm).toHaveValue(expectedFullDate)
 })
 
+test('sliders', async({page}) => {
+    //update attribute
+    /* const tempGauge = page.locator('[tabtitle="Temperature"] ngx-temperature-dragger circle')
+    await tempGauge.evaluate( node => {
+        node.setAttribute('cx', '232.630')
+        node.setAttribute('cy', '232.630')
+    })
+    await tempGauge.click() */
+
+    //mouse movement
+    const tempBox = page.locator('[tabtitle="Temperature"] ngx-temperature-dragger')
+    await tempBox.scrollIntoViewIfNeeded()
+
+    //creates a bounding box that you can mimic mouse movemount from
+    const box = await tempBox.boundingBox()
+
+    //setting the center of the box to be the origin
+    const x = box.x + box.width / 2
+    const y = box.y + box.height / 2
+    //place mouse on center of box
+    await page.mouse.move(x, y)
+
+    //move the mouse down and to the right
+    await page.mouse.down()
+    await page.mouse.move(x + 100, y)
+    await page.mouse.move(x + 100, y + 100)
+    await page.mouse.up()
+    await expect(tempBox).toContainText("30")
+})
+
+
+
 
 
