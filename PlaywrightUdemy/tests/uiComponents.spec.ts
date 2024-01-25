@@ -196,4 +196,34 @@ test("web tables", async({page}) => {
 
 })
 
+test("datepickers", async({page}) => {
+    await page.getByText('Forms').click()
+    await page.getByText('Datepicker').click()
+
+    const datepickerForm = page.getByPlaceholder("Form Picker")
+    await datepickerForm.click()
+
+    //logic to allow for any date within the same month to be picked
+    let date = new Date()
+    date.setDate(date.getDate() + 200)
+    const expectedDate = date.getDate().toString()
+    const expectedMonthShort = date.toLocaleString('En-US', {month: 'short'})
+    const expectedMonthLong = date.toLocaleString('En-US', {month: 'long'})
+    const expectedYear = date.getFullYear()
+    const expectedFullDate = `${expectedMonthShort} ${expectedDate}, ${expectedYear}`
+    let calendarMonthAndYear = await page.locator('nb-calendar-view-mode').textContent()
+    const expectedMonthAndYear = ` ${expectedMonthLong} ${expectedYear} `
+
+    //loop through and find correct month
+    while(!calendarMonthAndYear.includes(expectedMonthAndYear)){
+        await page.locator('nb-calendar-pageable-navigation [data-name="chevron-right"]').click()
+        calendarMonthAndYear = await page.locator('nb-calendar-view-mode').textContent()
+    }
+    
+    //click on 14th day of current month in calendar
+    await page.locator('[class="day-cell ng-star-inserted"]').getByText(expectedDate, {exact: true}).click()
+    await expect(datepickerForm).toHaveValue(expectedFullDate)
+})
+
+
 
